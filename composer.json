@@ -1,0 +1,10 @@
+{
+    "name": "bhdn/taskforce.loc",
+    "type": "project",
+    "autoload": {
+        "psr-4": {
+            "tf\\": "app/"
+        }
+    },
+    "require": {}
+}
