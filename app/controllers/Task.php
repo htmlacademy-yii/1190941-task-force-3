@@ -1,5 +1,16 @@
 <?php
+
+// qstn 1. Примеры использования исключений в продакшен коде. (работа с БД?)
+// qstn 2. 2 слова про SPL
+// qstn 3. Предпочитать строгую типизацию не строгой?
+// qstn 4. Не сильно понятно что такое генераторы и для чего нужны
+
 namespace tf\controllers;
+use tf\controllers\actions\AbstractAction;
+use tf\controllers\actions\CancelAction;
+use tf\controllers\actions\RespondAction;
+use tf\controllers\actions\AcceptAction;
+use tf\controllers\actions\AbandonAction;
 
 class Task
 {
@@ -17,47 +28,51 @@ class Task
         self::STATUS_FAILED => 'Провалено',
     ];
 
-    private const ACTION_CANCEL = 'cancel';
-    private const ACTION_RESPOND = 'respond';
-    private const ACTION_ACCEPT = 'accept';
-    private const ACTION_ABANDON = 'abandon';
-
-    private const ACTIONS_MAP = [
-        self::ACTION_CANCEL => 'Отменить',
-        self::ACTION_RESPOND => 'Откликнуться',
-        self::ACTION_ACCEPT => 'Выполнено',
-        self::ACTION_ABANDON => 'Отказаться',
+    private const ACTIONS_TO_STATUSES_MAP = [
+        CancelAction::CODE => self::STATUS_CANCELED,
+        AcceptAction::CODE => self::STATUS_DONE,
+        AbandonAction::CODE => self::STATUS_FAILED
     ];
 
-    private const ACTION_TO_STATUS_MAP = [
-        self::ACTION_CANCEL => self::STATUS_CANCELED,
-        self::ACTION_ACCEPT => self::STATUS_DONE,
-        self::ACTION_ABANDON => self::STATUS_FAILED,
-    ];
-
-    private const STATUS_TO_ACTIONS_MAP = [
-        self::STATUS_NEW => [self::ACTION_CANCEL, self::ACTION_RESPOND],
-        self::STATUS_IN_PROGRESS => [self::ACTION_ACCEPT, self::ACTION_ABANDON],
-    ];
-
-    public string $status;
+    private string $status;
     private int $customerID;
-    private int $performerID;
+    private ?int $performerID;
+    private array $actions;
 
-    function __construct(int $customerID, int $performerID, string $taskStatus)
+    function __construct(
+        int $customerID,
+        ?int $performerID,
+        string $taskStatus
+    )
     {
         $this->customerID = $customerID;
         $this->performerID = $performerID;
         $this->status = $taskStatus;
+        $this->actions = [
+            self::STATUS_NEW => [
+                new CancelAction(), new RespondAction()
+            ],
+            self::STATUS_IN_PROGRESS => [
+                new AcceptAction(), new AbandonAction()
+            ],
+        ];
     }
 
-    public function getStatusByAction(string $actionCode): ?string
+    public function setStatus(string $status): string
     {
-        return self::ACTION_TO_STATUS_MAP[$actionCode] ?? null;
+        return $this->status = $status;
     }
 
-    public function getActionsByStatus(): ?array
+    public function getStatusByAction(AbstractAction $action): ?string
     {
-        return self::STATUS_TO_ACTIONS_MAP[$this->status] ?? [];
+        return self::ACTIONS_TO_STATUSES_MAP[$action->getInnerTitle()] ?? null;
+    }
+
+    /**
+     * @return AbstractAction[]
+     */
+    public function getActionByStatus(): array
+    {
+        return $this->actions[$this->status];
     }
 }
