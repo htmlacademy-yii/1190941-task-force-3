@@ -1,16 +1,12 @@
 <?php
 
-// qstn 1. Примеры использования исключений в продакшен коде. (работа с БД?)
-// qstn 2. 2 слова про SPL
-// qstn 3. Предпочитать строгую типизацию не строгой?
-// qstn 4. Не сильно понятно что такое генераторы и для чего нужны
-
 namespace tf\controllers;
 use tf\controllers\actions\AbstractAction;
 use tf\controllers\actions\CancelAction;
 use tf\controllers\actions\RespondAction;
 use tf\controllers\actions\AcceptAction;
 use tf\controllers\actions\AbandonAction;
+use tf\exceptions\ExistenceException;
 
 class Task
 {
@@ -39,6 +35,9 @@ class Task
     private ?int $performerID;
     private array $actions;
 
+    /**
+     * @throws ExistenceException
+     */
     function __construct(
         int $customerID,
         ?int $performerID,
@@ -47,20 +46,34 @@ class Task
     {
         $this->customerID = $customerID;
         $this->performerID = $performerID;
+
+        if (!in_array($taskStatus, array_keys(self::STATUSES_MAP))) {
+            throw new ExistenceException('Указанного статуса не существует');
+        }
+
         $this->status = $taskStatus;
         $this->actions = [
             self::STATUS_NEW => [
-                new CancelAction(), new RespondAction()
+                'customer' => new CancelAction(),
+                'performer' => new RespondAction()
             ],
             self::STATUS_IN_PROGRESS => [
-                new AcceptAction(), new AbandonAction()
+                'customer' => new AcceptAction(),
+                'performer' => new AbandonAction()
             ],
         ];
     }
 
-    public function setStatus(string $status): string
+    /**
+     * @throws ExistenceException
+     */
+    public function setStatus(string $status): void
     {
-        return $this->status = $status;
+        if (!in_array($status, array_keys(self::STATUSES_MAP))) {
+            throw new ExistenceException('Указанного статуса не существует');
+        }
+
+        $this->status = $status;
     }
 
     public function getStatusByAction(AbstractAction $action): ?string
@@ -69,10 +82,14 @@ class Task
     }
 
     /**
-     * @return AbstractAction[]
+     * @throws ExistenceException
      */
-    public function getActionByStatus(): array
+    public function getActionByStatus(string $role): AbstractAction
     {
-        return $this->actions[$this->status];
+        if ($role !== 'customer' && $role !== 'performer') {
+            throw new ExistenceException('Не корректная роль пользователя');
+        }
+
+        return $this->actions[$this->status][$role];
     }
 }
