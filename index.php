@@ -6,22 +6,22 @@ use tf\exceptions\ExistenceException;
 require_once 'vendor/autoload.php';
 
 $task = null;
-$role = 'customer';
+$role = Task::ROLE_CUSTOMER;
 
 try {
-    $task = new Task(1, 2, 'new');
+    $task = new Task(1, 2, Task::STATUS_NEW);
 } catch (ExistenceException $e) {
     echo $e->getMessage();
 }
 
 try {
-    $task->setStatus('inProgress');
+    $task->setStatus(Task::STATUS_IN_PROGRESS);
 } catch (ExistenceException $e) {
     echo $e->getMessage();
 }
 
 try {
-    var_dump($task->getActionByStatus($role));
+    var_dump($task->getActionByRole($role));
 } catch (ExistenceException $e) {
     echo $e->getMessage();
 }

@@ -10,11 +10,14 @@ use tf\exceptions\ExistenceException;
 
 class Task
 {
-    private const STATUS_NEW = 'new';
-    private const STATUS_CANCELED = 'canceled';
-    private const STATUS_IN_PROGRESS = 'inProgress';
-    private const STATUS_DONE = 'done';
-    private const STATUS_FAILED = 'failed';
+    public const STATUS_NEW = 'new';
+    public const STATUS_CANCELED = 'canceled';
+    public const STATUS_IN_PROGRESS = 'inProgress';
+    public const STATUS_DONE = 'done';
+    public const STATUS_FAILED = 'failed';
+
+    public const ROLE_CUSTOMER = 'customer';
+    public const ROLE_PERFORMER = 'performer';
 
     private const STATUSES_MAP = [
         self::STATUS_NEW => 'Новое',
@@ -54,12 +57,12 @@ class Task
         $this->status = $taskStatus;
         $this->actions = [
             self::STATUS_NEW => [
-                'customer' => new CancelAction(),
-                'performer' => new RespondAction()
+                self::ROLE_CUSTOMER => new CancelAction(),
+                self::ROLE_PERFORMER => new RespondAction()
             ],
             self::STATUS_IN_PROGRESS => [
-                'customer' => new AcceptAction(),
-                'performer' => new AbandonAction()
+                self::ROLE_CUSTOMER => new AcceptAction(),
+                self::ROLE_PERFORMER => new AbandonAction()
             ],
         ];
     }
@@ -69,7 +72,7 @@ class Task
      */
     public function setStatus(string $status): void
     {
-        if (!in_array($status, array_keys(self::STATUSES_MAP))) {
+        if (!isset(self::STATUSES_MAP[$status])) {
             throw new ExistenceException('Указанного статуса не существует');
         }
 
@@ -84,9 +87,9 @@ class Task
     /**
      * @throws ExistenceException
      */
-    public function getActionByStatus(string $role): AbstractAction
+    public function getActionByRole(string $role): AbstractAction
     {
-        if ($role !== 'customer' && $role !== 'performer') {
+        if ($role !== self::ROLE_CUSTOMER && $role !== self::ROLE_PERFORMER) {
             throw new ExistenceException('Не корректная роль пользователя');
         }
 
