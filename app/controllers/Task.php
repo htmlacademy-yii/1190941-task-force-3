@@ -50,7 +50,7 @@ class Task
         $this->customerID = $customerID;
         $this->performerID = $performerID;
 
-        if (!in_array($taskStatus, array_keys(self::STATUSES_MAP))) {
+        if (!isset(self::STATUSES_MAP[$taskStatus])) {
             throw new ExistenceException('Указанного статуса не существует');
         }
 
