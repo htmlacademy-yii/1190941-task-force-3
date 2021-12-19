@@ -1,24 +1,23 @@
 <?php
 
-// qstn 1. Примеры использования исключений в продакшен коде. (работа с БД?)
-// qstn 2. 2 слова про SPL
-// qstn 3. Предпочитать строгую типизацию не строгой?
-// qstn 4. Не сильно понятно что такое генераторы и для чего нужны
-
 namespace tf\controllers;
 use tf\controllers\actions\AbstractAction;
 use tf\controllers\actions\CancelAction;
 use tf\controllers\actions\RespondAction;
 use tf\controllers\actions\AcceptAction;
 use tf\controllers\actions\AbandonAction;
+use tf\exceptions\ExistenceException;
 
 class Task
 {
-    private const STATUS_NEW = 'new';
-    private const STATUS_CANCELED = 'canceled';
-    private const STATUS_IN_PROGRESS = 'inProgress';
-    private const STATUS_DONE = 'done';
-    private const STATUS_FAILED = 'failed';
+    public const STATUS_NEW = 'new';
+    public const STATUS_CANCELED = 'canceled';
+    public const STATUS_IN_PROGRESS = 'inProgress';
+    public const STATUS_DONE = 'done';
+    public const STATUS_FAILED = 'failed';
+
+    public const ROLE_CUSTOMER = 'customer';
+    public const ROLE_PERFORMER = 'performer';
 
     private const STATUSES_MAP = [
         self::STATUS_NEW => 'Новое',
@@ -39,6 +38,9 @@ class Task
     private ?int $performerID;
     private array $actions;
 
+    /**
+     * @throws ExistenceException
+     */
     function __construct(
         int $customerID,
         ?int $performerID,
@@ -47,20 +49,34 @@ class Task
     {
         $this->customerID = $customerID;
         $this->performerID = $performerID;
+
+        if (!isset(self::STATUSES_MAP[$taskStatus])) {
+            throw new ExistenceException('Указанного статуса не существует');
+        }
+
         $this->status = $taskStatus;
         $this->actions = [
             self::STATUS_NEW => [
-                new CancelAction(), new RespondAction()
+                self::ROLE_CUSTOMER => new CancelAction(),
+                self::ROLE_PERFORMER => new RespondAction()
             ],
             self::STATUS_IN_PROGRESS => [
-                new AcceptAction(), new AbandonAction()
+                self::ROLE_CUSTOMER => new AcceptAction(),
+                self::ROLE_PERFORMER => new AbandonAction()
             ],
         ];
     }
 
-    public function setStatus(string $status): string
+    /**
+     * @throws ExistenceException
+     */
+    public function setStatus(string $status): void
     {
-        return $this->status = $status;
+        if (!isset(self::STATUSES_MAP[$status])) {
+            throw new ExistenceException('Указанного статуса не существует');
+        }
+
+        $this->status = $status;
     }
 
     public function getStatusByAction(AbstractAction $action): ?string
@@ -69,10 +85,14 @@ class Task
     }
 
     /**
-     * @return AbstractAction[]
+     * @throws ExistenceException
      */
-    public function getActionByStatus(): array
+    public function getActionByRole(string $role): AbstractAction
     {
-        return $this->actions[$this->status];
+        if ($role !== self::ROLE_CUSTOMER && $role !== self::ROLE_PERFORMER) {
+            throw new ExistenceException('Не корректная роль пользователя');
+        }
+
+        return $this->actions[$this->status][$role];
     }
 }
