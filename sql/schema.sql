@@ -3,15 +3,30 @@ CREATE DATABASE taskforce_db
 
 USE taskforce_db;
 
+CREATE TABLE cities
+(
+  id     INT UNSIGNED AUTO_INCREMENT PRIMARY KEY NOT NULL,
+  title  VARCHAR(255)                            NOT NULL UNIQUE,
+  lat    DECIMAL(13, 10)                          NOT NULL,
+  `long` DECIMAL(13, 10)                          NOT NULL
+);
+
+CREATE TABLE categories
+(
+  id   INT UNSIGNED AUTO_INCREMENT PRIMARY KEY NOT NULL,
+  name VARCHAR(255)                            NOT NULL UNIQUE,
+  icon VARCHAR(255)                            NOT NULL UNIQUE
+);
+
 CREATE TABLE users
 (
-  id               INT AUTO_INCREMENT PRIMARY KEY NOT NULL,
-  status           VARCHAR(45)                    NOT NULL, # todo возможно таблица отдельная
-  name             VARCHAR(255)                   NOT NULL,
-  email            VARCHAR(255)                   NOT NULL UNIQUE,
-  password         VARCHAR(255)                   NOT NULL,
-  created_at       DATETIME DEFAULT NOW()         NOT NULL,
-  last_action_time DATETIME DEFAULT NOW()         NOT NULL,
+  id               INT UNSIGNED AUTO_INCREMENT PRIMARY KEY NOT NULL,
+  status           VARCHAR(45)                             NOT NULL,
+  name             VARCHAR(255)                            NOT NULL,
+  email            VARCHAR(255)                            NOT NULL UNIQUE,
+  password         VARCHAR(255)                            NOT NULL,
+  created_at       DATETIME DEFAULT NOW()                  NOT NULL,
+  last_action_time DATETIME DEFAULT NOW()                  NOT NULL,
 
   avatar_name      VARCHAR(255) UNIQUE,
   date_of_birth    DATETIME,
@@ -19,16 +34,10 @@ CREATE TABLE users
   telegram         VARCHAR(64) UNIQUE,
   about            TEXT,
 
-  city_id          INT UNSIGNED                   NOT NULL,
-  role_id          TINYINT UNSIGNED               NOT NULL,
+  city_id          INT UNSIGNED                            NOT NULL,
+  role_id          TINYINT UNSIGNED                        NOT NULL,
 
   FOREIGN KEY (city_id) REFERENCES cities (id) ON DELETE CASCADE
-);
-
-CREATE TABLE cities
-(
-  id    INT UNSIGNED AUTO_INCREMENT PRIMARY KEY NOT NULL,
-  title VARCHAR(255)                            NOT NULL UNIQUE
 );
 
 CREATE TABLE tasks
@@ -38,13 +47,13 @@ CREATE TABLE tasks
   created_at   DATETIME         DEFAULT NOW()          NOT NULL,
   title        VARCHAR(255)                            NOT NULL,
   description  TEXT                                    NOT NULL,
-  lat          DECIMAL(10, 8),
-  lng          DECIMAL(10, 8),
+  lat          DECIMAL(13, 10),
+  lng          DECIMAL(13, 10),
   price        MEDIUMINT UNSIGNED,
   deadline     DATETIME,
 
   category_id  INT UNSIGNED                            NOT NULL,
-  customer_id  INT UNSIGNED                            NOT NULL, # todo проверить что остается в поле при удалении
+  customer_id  INT UNSIGNED                            NOT NULL,
   city_id      INT UNSIGNED,
   performer_id INT UNSIGNED,
 
@@ -78,12 +87,6 @@ CREATE TABLE user_reviews
 
   FOREIGN KEY (reviewer_id) REFERENCES users (id) ON DELETE NO ACTION,
   FOREIGN KEY (task_id) REFERENCES tasks (id) ON DELETE CASCADE
-);
-
-CREATE TABLE categories
-(
-  id    INT UNSIGNED AUTO_INCREMENT PRIMARY KEY NOT NULL,
-  title VARCHAR(255)                            NOT NULL UNIQUE
 );
 
 CREATE TABLE user_specializations

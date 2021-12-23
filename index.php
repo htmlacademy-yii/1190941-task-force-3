@@ -1,30 +1,14 @@
 <?php
 
-use tf\controllers\Task;
+use tf\helpers\CsvToSqlParser;
 use tf\exceptions\ExistenceException;
 
 require_once 'vendor/autoload.php';
 
-$task = null;
-$role = Task::ROLE_CUSTOMER;
-
-try {
-    $task = new Task(1, 2, Task::STATUS_NEW);
-} catch (ExistenceException $e) {
-    echo $e->getMessage();
+foreach (new FilesystemIterator('data', FilesystemIterator::CURRENT_AS_PATHNAME) as $filePath) {
+    try {
+        CsvToSqlParser::parse($filePath, 'sql');
+    } catch (ExistenceException $e) {
+        echo $e->getMessage();
+    }
 }
-
-try {
-    $task->setStatus(Task::STATUS_IN_PROGRESS);
-} catch (ExistenceException $e) {
-    echo $e->getMessage();
-}
-
-try {
-    var_dump($task->getActionByRole($role));
-} catch (ExistenceException $e) {
-    echo $e->getMessage();
-}
-
-
-
