@@ -5,16 +5,10 @@ use tf\exceptions\ExistenceException;
 
 require_once 'vendor/autoload.php';
 
-$outputDir = 'sql';
-
-try {
-    CsvToSqlParser::parse('data/categories.csv', $outputDir);
-} catch (ExistenceException $e) {
-    echo $e->getMessage();
-}
-
-try {
-    CsvToSqlParser::parse('data/cities.csv', $outputDir);
-} catch (ExistenceException $e) {
-    echo $e->getMessage();
+foreach (new FilesystemIterator('data', FilesystemIterator::CURRENT_AS_PATHNAME) as $filePath) {
+    try {
+        CsvToSqlParser::parse($filePath, 'sql');
+    } catch (ExistenceException $e) {
+        echo $e->getMessage();
+    }
 }
