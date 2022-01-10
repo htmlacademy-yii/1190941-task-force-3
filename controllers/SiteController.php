@@ -9,6 +9,7 @@ use yii\web\Response;
 use yii\filters\VerbFilter;
 use app\models\LoginForm;
 use app\models\ContactForm;
+use app\models\Category;
 
 class SiteController extends Controller
 {
@@ -121,8 +122,17 @@ class SiteController extends Controller
      *
      * @return string
      */
-    public function actionAbout()
+    public function actionAbout(): string
     {
         return $this->render('about');
+    }
+
+    public function actionCategories(): string
+    {
+        $categories = Category::find()->all();
+
+        return $this->render('index', [
+            'categories' => $categories
+        ]);
     }
 }
