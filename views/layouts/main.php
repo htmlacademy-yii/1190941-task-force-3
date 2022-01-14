@@ -44,6 +44,7 @@ AppAsset::register($this);
 			</ul>
 		</div>
 	</nav>
+
 	<div class="user-block">
 		<a href="#">
 			<img class="user-photo" src="img/man-glasses.png" width="55" height="55" alt="Аватар">
