@@ -53,10 +53,10 @@ class Task extends ActiveRecord
             [['description'], 'string'],
             [['lat', 'long'], 'number'],
             [['title'], 'string', 'max' => 255],
-            [['city_id'], 'exist', 'skipOnError' => true, 'targetClass' => City::className(), 'targetAttribute' => ['city_id' => 'id']],
-            [['category_id'], 'exist', 'skipOnError' => true, 'targetClass' => Category::className(), 'targetAttribute' => ['category_id' => 'id']],
-            [['customer_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['customer_id' => 'id']],
-            [['performer_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['performer_id' => 'id']],
+            [['city_id'], 'exist', 'skipOnError' => true, 'targetClass' => City::class, 'targetAttribute' => ['city_id' => 'id']],
+            [['category_id'], 'exist', 'skipOnError' => true, 'targetClass' => Category::class, 'targetAttribute' => ['category_id' => 'id']],
+            [['customer_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['customer_id' => 'id']],
+            [['performer_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['performer_id' => 'id']],
         ];
     }
 
@@ -67,14 +67,14 @@ class Task extends ActiveRecord
     {
         return [
             'id' => 'ID',
-            'status' => 'Status',
-            'created_at' => 'Created At',
-            'title' => 'Title',
-            'description' => 'Description',
-            'lat' => 'Lat',
-            'long' => 'Long',
+            'status' => 'Статус',
+            'created_at' => 'Создана',
+            'title' => 'Заголовок',
+            'description' => 'Описание',
+            'lat' => 'Широта',
+            'long' => 'Долгота',
             'price' => 'Price',
-            'deadline' => 'Deadline',
+            'deadline' => 'Дата завершения',
             'category_id' => 'Category ID',
             'customer_id' => 'Customer ID',
             'city_id' => 'City ID',
@@ -89,7 +89,7 @@ class Task extends ActiveRecord
      */
     public function getCategory(): ActiveQuery
     {
-        return $this->hasOne(Category::className(), ['id' => 'category_id']);
+        return $this->hasOne(Category::class, ['id' => 'category_id']);
     }
 
     /**
@@ -99,7 +99,7 @@ class Task extends ActiveRecord
      */
     public function getCity(): ActiveQuery
     {
-        return $this->hasOne(City::className(), ['id' => 'city_id']);
+        return $this->hasOne(City::class, ['id' => 'city_id']);
     }
 
     /**
@@ -109,7 +109,7 @@ class Task extends ActiveRecord
      */
     public function getCustomer(): ActiveQuery
     {
-        return $this->hasOne(User::className(), ['id' => 'customer_id']);
+        return $this->hasOne(User::class, ['id' => 'customer_id']);
     }
 
     /**
@@ -119,7 +119,7 @@ class Task extends ActiveRecord
      */
     public function getPerformer(): ActiveQuery
     {
-        return $this->hasOne(User::className(), ['id' => 'performer_id']);
+        return $this->hasOne(User::class, ['id' => 'performer_id']);
     }
 
     /**
@@ -129,7 +129,7 @@ class Task extends ActiveRecord
      */
     public function getRefusalReasons(): ActiveQuery
     {
-        return $this->hasMany(RefusalReason::className(), ['task_id' => 'id']);
+        return $this->hasMany(RefusalReason::class, ['task_id' => 'id']);
     }
 
     /**
@@ -139,7 +139,7 @@ class Task extends ActiveRecord
      */
     public function getTaskAttachments(): ActiveQuery
     {
-        return $this->hasMany(TaskAttachment::className(), ['task_id' => 'id']);
+        return $this->hasMany(TaskAttachment::class, ['task_id' => 'id']);
     }
 
     /**
@@ -149,7 +149,7 @@ class Task extends ActiveRecord
      */
     public function getTaskResponses(): ActiveQuery
     {
-        return $this->hasMany(TaskResponse::className(), ['task_id' => 'id']);
+        return $this->hasMany(TaskResponse::class, ['task_id' => 'id']);
     }
 
     /**
@@ -159,6 +159,6 @@ class Task extends ActiveRecord
      */
     public function getUserReviews(): ActiveQuery
     {
-        return $this->hasMany(UserReview::className(), ['task_id' => 'id']);
+        return $this->hasMany(UserReview::class, ['task_id' => 'id']);
     }
 }
