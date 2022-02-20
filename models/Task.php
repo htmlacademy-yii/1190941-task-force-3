@@ -2,6 +2,10 @@
 
 namespace app\models;
 
+use DateTime;
+use DateTimeZone;
+
+use Yii;
 use yii\db\ActiveRecord;
 use yii\db\ActiveQuery;
 
@@ -51,12 +55,37 @@ class Task extends ActiveRecord
             [['created_at', 'deadline'], 'safe'],
             [['title', 'description', 'category_id', 'customer_id'], 'required'],
             [['description'], 'string'],
+            [['deadline'], 'date', 'format' => 'yyyy-mm-dd', 'min' => $this->getCurrentDate()],
             [['lat', 'long'], 'number'],
             [['title'], 'string', 'max' => 255],
-            [['city_id'], 'exist', 'skipOnError' => true, 'targetClass' => City::class, 'targetAttribute' => ['city_id' => 'id']],
-            [['category_id'], 'exist', 'skipOnError' => true, 'targetClass' => Category::class, 'targetAttribute' => ['category_id' => 'id']],
-            [['customer_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['customer_id' => 'id']],
-            [['performer_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['performer_id' => 'id']],
+            [
+                ['city_id'],
+                'exist',
+                'skipOnError' => true,
+                'targetClass' => City::class,
+                'targetAttribute' => ['city_id' => 'id']
+            ],
+            [
+                ['category_id'],
+                'exist',
+                'skipOnError' => true,
+                'targetClass' => Category::class,
+                'targetAttribute' => ['category_id' => 'id']
+            ],
+            [
+                ['customer_id'],
+                'exist',
+                'skipOnError' => true,
+                'targetClass' => User::class,
+                'targetAttribute' => ['customer_id' => 'id']
+            ],
+            [
+                ['performer_id'],
+                'exist',
+                'skipOnError' => true,
+                'targetClass' => User::class,
+                'targetAttribute' => ['performer_id' => 'id']
+            ],
         ];
     }
 
@@ -73,7 +102,7 @@ class Task extends ActiveRecord
             'description' => 'Описание',
             'lat' => 'Широта',
             'long' => 'Долгота',
-            'price' => 'Price',
+            'price' => 'Бюджет',
             'deadline' => 'Дата завершения',
             'category_id' => 'Category ID',
             'customer_id' => 'Customer ID',
@@ -160,5 +189,20 @@ class Task extends ActiveRecord
     public function getUserReviews(): ActiveQuery
     {
         return $this->hasMany(UserReview::class, ['task_id' => 'id']);
+    }
+
+    public static function getCurrentDate(): string
+    {
+        $currentDate = new DateTime('now', new DateTimeZone('Europe/Moscow'));
+        return $currentDate->format('Y-m-d');
+    }
+
+    public function beforeValidate(): bool
+    {
+        if (!$this->customer_id) {
+            $this->customer_id = Yii::$app->user->getId();
+        }
+
+        return parent::beforeValidate();
     }
 }

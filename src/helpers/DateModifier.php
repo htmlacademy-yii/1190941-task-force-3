@@ -29,9 +29,8 @@ class DateModifier
      *
      * @return string Рассчитанная форма множественнго числа
      */
-    private static function getNounPluralForm(int $number, string $one, string $two, string $many): string
+    public static function getNounPluralForm(int $number, string $one, string $two, string $many): string
     {
-        $number = (int)$number;
         $mod10 = $number % 10;
         $mod100 = $number % 100;
 
@@ -60,7 +59,7 @@ class DateModifier
      *
      * @return string
      */
-    public static function getRelativeFormat(string $postDate, string $stringEnd): string
+    public static function getRelativeFormat(string $postDate, string $stringEnd = ''): string
     {
         $postDate = new DateTime($postDate, new DateTimeZone('Europe/Moscow'));
         $currentDate = new DateTime('now', new DateTimeZone('Europe/Moscow'));
@@ -94,5 +93,12 @@ class DateModifier
         }
 
         return $correctDateFormat;
+    }
+
+    public static function getDateTime(string $dateTime, string $format): string
+    {
+        $dateTime = new DateTime($dateTime, new DateTimeZone('Europe/Moscow'));
+
+        return $dateTime->format($format);
     }
 }

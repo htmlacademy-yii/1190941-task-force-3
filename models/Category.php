@@ -4,6 +4,8 @@ namespace app\models;
 
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
+use yii\db\Query;
+use yii\helpers\ArrayHelper;
 
 /**
  * This is the model class for table "categories".
@@ -45,7 +47,7 @@ class Category extends ActiveRecord
     {
         return [
             'id' => 'ID',
-            'name' => 'Name',
+            'name' => 'Название категории',
             'icon' => 'Icon',
         ];
     }
@@ -57,7 +59,7 @@ class Category extends ActiveRecord
      */
     public function getTasks(): ActiveQuery
     {
-        return $this->hasMany(Task::className(), ['category_id' => 'id']);
+        return $this->hasMany(Task::class, ['category_id' => 'id']);
     }
 
     /**
@@ -67,6 +69,11 @@ class Category extends ActiveRecord
      */
     public function getUserSpecializations(): ActiveQuery
     {
-        return $this->hasMany(UserSpecialization::className(), ['category_id' => 'id']);
+        return $this->hasMany(UserSpecialization::class, ['category_id' => 'id']);
+    }
+
+    public static function getCategories(): array
+    {
+        return ArrayHelper::map((new Query())->select(['id', 'name'])->from('categories')->all(), 'id', 'name');
     }
 }

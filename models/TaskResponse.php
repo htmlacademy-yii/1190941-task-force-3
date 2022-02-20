@@ -12,6 +12,7 @@ use yii\db\ActiveQuery;
  * @property string|null $comment
  * @property string $created_at
  * @property int $price
+ * @property int $status
  * @property int $task_id
  * @property int $user_id
  *
@@ -38,8 +39,8 @@ class TaskResponse extends ActiveRecord
             [['created_at'], 'safe'],
             [['price', 'task_id', 'user_id'], 'required'],
             [['price', 'task_id', 'user_id'], 'integer'],
-            [['task_id'], 'exist', 'skipOnError' => true, 'targetClass' => Task::className(), 'targetAttribute' => ['task_id' => 'id']],
-            [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['user_id' => 'id']],
+            [['task_id'], 'exist', 'skipOnError' => true, 'targetClass' => Task::class, 'targetAttribute' => ['task_id' => 'id']],
+            [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['user_id' => 'id']],
         ];
     }
 
@@ -65,7 +66,7 @@ class TaskResponse extends ActiveRecord
      */
     public function getTask(): ActiveQuery
     {
-        return $this->hasOne(Task::className(), ['id' => 'task_id']);
+        return $this->hasOne(Task::class, ['id' => 'task_id']);
     }
 
     /**
@@ -75,6 +76,6 @@ class TaskResponse extends ActiveRecord
      */
     public function getUser(): ActiveQuery
     {
-        return $this->hasOne(User::className(), ['id' => 'user_id']);
+        return $this->hasOne(User::class, ['id' => 'user_id']);
     }
 }

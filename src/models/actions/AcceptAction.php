@@ -8,7 +8,7 @@ class AcceptAction extends AbstractAction
 
     public function getTitle(): string
     {
-        return 'Выполнено';
+        return 'Завершить задание';
     }
 
     public function getInnerTitle(): string
@@ -16,7 +16,7 @@ class AcceptAction extends AbstractAction
         return self::CODE;
     }
 
-    public function checkPermissions(int $userID, int $customerID, int $performerID): bool
+    public function checkPermission(int $userID, int $customerID, ?int $performerID): bool
     {
         return $userID === $customerID;
     }

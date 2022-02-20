@@ -2,13 +2,13 @@
 
 namespace tf\models\actions;
 
-class AbandonAction extends AbstractAction
+class RefuseAction extends AbstractAction
 {
-    public const CODE = 'abandon';
+    public const CODE = 'refuse';
 
     public function getTitle(): string
     {
-        return 'Отказаться';
+        return 'Отказаться от задания';
     }
 
     public function getInnerTitle(): string
@@ -16,7 +16,7 @@ class AbandonAction extends AbstractAction
         return self::CODE;
     }
 
-    public function checkPermissions(int $userID, int $customerID, int $performerID): bool
+    public function checkPermission(int $userID, int $customerID, ?int $performerID): bool
     {
         return $userID === $performerID;
     }

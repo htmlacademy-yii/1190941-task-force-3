@@ -1,25 +1,27 @@
 <?php
 
 namespace tf\models;
+
 use tf\models\actions\AbstractAction;
 use tf\models\actions\CancelAction;
 use tf\models\actions\RespondAction;
 use tf\models\actions\AcceptAction;
-use tf\models\actions\AbandonAction;
+use tf\models\actions\RefuseAction;
 use tf\exceptions\ExistenceException;
+use Yii;
 
 class Task
 {
-    public const STATUS_NEW = 'new';
-    public const STATUS_CANCELED = 'canceled';
-    public const STATUS_IN_PROGRESS = 'inProgress';
-    public const STATUS_DONE = 'done';
-    public const STATUS_FAILED = 'failed';
+    public const STATUS_NEW = 1;
+    public const STATUS_CANCELED = 2;
+    public const STATUS_IN_PROGRESS = 3;
+    public const STATUS_DONE = 4;
+    public const STATUS_FAILED = 5;
 
     public const ROLE_CUSTOMER = 'customer';
     public const ROLE_PERFORMER = 'performer';
 
-    private const STATUSES_MAP = [
+    public const STATUSES_MAP = [
         self::STATUS_NEW => 'Новое',
         self::STATUS_CANCELED => 'Отменено',
         self::STATUS_IN_PROGRESS => 'В работе',
@@ -30,7 +32,7 @@ class Task
     private const ACTIONS_TO_STATUSES_MAP = [
         CancelAction::CODE => self::STATUS_CANCELED,
         AcceptAction::CODE => self::STATUS_DONE,
-        AbandonAction::CODE => self::STATUS_FAILED
+        RefuseAction::CODE => self::STATUS_FAILED
     ];
 
     private string $status;
@@ -62,21 +64,9 @@ class Task
             ],
             self::STATUS_IN_PROGRESS => [
                 self::ROLE_CUSTOMER => new AcceptAction(),
-                self::ROLE_PERFORMER => new AbandonAction()
+                self::ROLE_PERFORMER => new RefuseAction()
             ],
         ];
-    }
-
-    /**
-     * @throws ExistenceException
-     */
-    public function setStatus(string $status): void
-    {
-        if (!isset(self::STATUSES_MAP[$status])) {
-            throw new ExistenceException('Указанного статуса не существует');
-        }
-
-        $this->status = $status;
     }
 
     public function getStatusByAction(AbstractAction $action): ?string
@@ -87,12 +77,20 @@ class Task
     /**
      * @throws ExistenceException
      */
-    public function getActionByRole(string $role): AbstractAction
+    public function getActionByRole(int $userID): ?AbstractAction
     {
+        $role = array_key_first(Yii::$app->authManager->getRolesByUser($userID));
+
         if ($role !== self::ROLE_CUSTOMER && $role !== self::ROLE_PERFORMER) {
             throw new ExistenceException('Не корректная роль пользователя');
         }
 
-        return $this->actions[$this->status][$role];
+        $action = $this->actions[$this->status][$role] ?? null;
+
+        if ($action && $action->checkPermission($userID, $this->customerID, $this->performerID)) {
+            return $action;
+        }
+
+        return null;
     }
 }

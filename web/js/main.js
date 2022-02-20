@@ -54,6 +54,10 @@ if (starRating) {
         var stars = event.currentTarget.childNodes;
         var rating = 0;
 
+        for (var j = 0; j < stars.length; j++) {
+            stars[j].className = "";
+        }
+
         for (var i = 0; i < stars.length; i++) {
             var element = stars[i];
 
@@ -67,7 +71,7 @@ if (starRating) {
             }
         }
 
-        var inputField = starRating.previousSibling;
+        var inputField = document.querySelector('#userreviewaddform-rating');
         inputField.value = rating;
     });
 }

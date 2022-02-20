@@ -2,20 +2,36 @@
 
 namespace tf\models\actions;
 
+use app\models\TaskResponse;
+use Yii;
+use app\models\User;
+
 class RespondAction extends AbstractAction
 {
+    public const CODE = 'respond';
+
     public function getTitle(): string
     {
-        return 'Откликнуться';
+        return 'Откликнуться на задание';
     }
 
     public function getInnerTitle(): string
     {
-        return 'respond';
+        return self::CODE;
     }
 
-    public function checkPermissions(int $userID, int $customerID, int $performerID): bool
+    public function checkPermission(int $userID, int $customerID, ?int $performerID): bool
     {
-        return $userID === $performerID;
+        if (
+            Yii::$app->user->can(User::ROLE_PERFORMER)
+            && TaskResponse::find()->where([
+                'user_id' => Yii::$app->user->getId(),
+                'task_id' => Yii::$app->request->get('id')
+            ])->one()
+        ) {
+            return false;
+        }
+
+        return true;
     }
 }
