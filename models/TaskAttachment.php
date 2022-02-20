@@ -10,7 +10,7 @@ use yii\db\ActiveQuery;
  *
  * @property int $id
  * @property string $attachment_path
- * @property int $type
+ * @property int $size
  * @property int $task_id
  *
  * @property Task $task
@@ -31,11 +31,11 @@ class TaskAttachment extends ActiveRecord
     public function rules(): array
     {
         return [
-            [['attachment_path', 'type', 'task_id'], 'required'],
-            [['type', 'task_id'], 'integer'],
+            [['attachment_path', 'size', 'task_id'], 'required'],
+            [['size', 'task_id'], 'integer'],
             [['attachment_path'], 'string', 'max' => 255],
             [['attachment_path'], 'unique'],
-            [['task_id'], 'exist', 'skipOnError' => true, 'targetClass' => Task::className(), 'targetAttribute' => ['task_id' => 'id']],
+            [['task_id'], 'exist', 'skipOnError' => true, 'targetClass' => Task::class, 'targetAttribute' => ['task_id' => 'id']],
         ];
     }
 
@@ -47,7 +47,7 @@ class TaskAttachment extends ActiveRecord
         return [
             'id' => 'ID',
             'attachment_path' => 'Attachment Path',
-            'type' => 'Type',
+            'size' => 'Size',
             'task_id' => 'Task ID',
         ];
     }
@@ -59,6 +59,6 @@ class TaskAttachment extends ActiveRecord
      */
     public function getTask(): ActiveQuery
     {
-        return $this->hasOne(Task::className(), ['id' => 'task_id']);
+        return $this->hasOne(Task::class, ['id' => 'task_id']);
     }
 }

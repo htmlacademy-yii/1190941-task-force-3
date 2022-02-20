@@ -2,8 +2,6 @@
 
 use yii\db\Migration;
 
-//qstn что такое behaviors()?
-
 /**
  * Class m220118_161124_base
  */
@@ -16,36 +14,36 @@ class m220118_161124_create_schema extends Migration
     {
         $this->createTable('cities', [
             'id' => $this->primaryKey()->unsigned(),
-            'title' => $this->char(255)->notNull()->unique(), //qstn нет varchar()?
+            'title' => $this->string(255)->notNull()->unique(),
             'lat' => $this->decimal(13, 10)->notNull(),
             'long' => $this->decimal(13, 10)->notNull(),
         ]);
 
         $this->createTable('categories', [
             'id' => $this->primaryKey()->unsigned(),
-            'name' => $this->char(255)->notNull()->unique(),
-            'icon' => $this->char(255)->notNull()->unique(),
+            'name' => $this->string(255)->notNull()->unique(),
+            'icon' => $this->string(255)->notNull()->unique(),
         ]);
 
         $this->createTable('users', [
             'id' => $this->primaryKey()->unsigned(),
-            'status' => $this->char(45)->notNull(),
-            'name' => $this->char(255)->notNull(),
-            'email' => $this->char(255)->notNull()->unique(),
-            'password' => $this->char(255)->notNull(),
+            'status' => $this->string(45)->notNull(),
+            'name' => $this->string(255)->notNull(),
+            'email' => $this->string(255)->notNull()->unique(),
+            'password' => $this->string(255)->notNull(),
             'created_at' => $this->dateTime()->defaultExpression('NOW()')->notNull(),
             'last_action_time' => $this->dateTime()->defaultExpression('NOW()')->notNull(),
-            'avatar_name' => $this->char(255)->unique(),
+            'avatar_name' => $this->string(255)->unique(),
             'date_of_birth' => $this->dateTime(),
-            'phone' => $this->char(11)->unique(),
-            'telegram' => $this->char(64)->unique(),
+            'phone' => $this->string(11)->unique(),
+            'telegram' => $this->string(64)->unique(),
             'about' => $this->text(),
             'city_id' => $this->integer()->unsigned()->notNull(),
             'role_id' => $this->tinyInteger()->unsigned()->notNull(),
         ]);
 
         $this->addForeignKey(
-            'users_fk_city_id', // qstn есть стандарт того как именуют ключи FK?
+            'users_fk_city_id', // todo рекомендация по именованию ключей fk_users_city_id_cities_id
             'users',
             'city_id',
             'cities',
@@ -56,8 +54,8 @@ class m220118_161124_create_schema extends Migration
         $this->createTable('tasks', [
             'id' => $this->primaryKey()->unsigned(),
             'status' => $this->tinyInteger()->unsigned()->defaultValue(1)->notNull(),
-            'created_at' => $this->dateTime()->defaultExpression('NOW()')->notNull(), // qstn корректно? текущая дата по умолчанию
-            'title' => $this->char(255)->notNull(),
+            'created_at' => $this->dateTime()->defaultExpression('NOW()')->notNull(),
+            'title' => $this->string(255)->notNull(),
             'description' => $this->text()->notNull(),
             'lat' => $this->decimal(13, 10),
             'long' => $this->decimal(13, 10),
@@ -178,7 +176,7 @@ class m220118_161124_create_schema extends Migration
 
         $this->createTable('task_attachments', [
             'id' => $this->primaryKey()->unsigned(),
-            'attachment_path' => $this->char(255)->notNull()->unique(),
+            'attachment_path' => $this->string(255)->notNull()->unique(),
             'type' => $this->tinyInteger()->unsigned()->notNull(),
             'task_id' => $this->integer()->unsigned()->notNull()
         ]);

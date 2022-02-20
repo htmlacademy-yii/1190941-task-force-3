@@ -13,6 +13,7 @@ use yii\db\ActiveQuery;
  * @property int $rating
  * @property string $created_at
  * @property int $reviewer_id
+ * @property int $user_id
  * @property int $task_id
  *
  * @property User $reviewer
@@ -34,12 +35,13 @@ class UserReview extends ActiveRecord
     public function rules(): array
     {
         return [
-            [['review', 'rating', 'reviewer_id', 'task_id'], 'required'],
+            [['review', 'rating', 'reviewer_id', 'task_id', 'user_id'], 'required'],
             [['review'], 'string'],
             [['rating', 'reviewer_id', 'task_id'], 'integer'],
             [['created_at'], 'safe'],
-            [['reviewer_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['reviewer_id' => 'id']],
-            [['task_id'], 'exist', 'skipOnError' => true, 'targetClass' => Task::className(), 'targetAttribute' => ['task_id' => 'id']],
+            [['reviewer_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['reviewer_id' => 'id']],
+            [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['user_id' => 'id']],
+            [['task_id'], 'exist', 'skipOnError' => true, 'targetClass' => Task::class, 'targetAttribute' => ['task_id' => 'id']],
         ];
     }
 
@@ -65,7 +67,7 @@ class UserReview extends ActiveRecord
      */
     public function getReviewer(): ActiveQuery
     {
-        return $this->hasOne(User::className(), ['id' => 'reviewer_id']);
+        return $this->hasOne(User::class, ['id' => 'reviewer_id']);
     }
 
     /**
@@ -75,6 +77,6 @@ class UserReview extends ActiveRecord
      */
     public function getTask(): ActiveQuery
     {
-        return $this->hasOne(Task::className(), ['id' => 'task_id']);
+        return $this->hasOne(Task::class, ['id' => 'task_id']);
     }
 }

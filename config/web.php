@@ -6,12 +6,22 @@ $db = require __DIR__ . '/db.php';
 $config = [
     'id' => 'basic',
     'basePath' => dirname(__DIR__),
+    'language' => 'ru-RU',
+    'defaultRoute' => 'auth/login',
     'bootstrap' => ['log'],
     'aliases' => [
         '@bower' => '@vendor/bower-asset',
         '@npm'   => '@vendor/npm-asset',
     ],
     'components' => [
+        'authManager' => [
+            'class' => 'yii\rbac\DbManager',
+        ],
+        'formatter' => [
+            'locale' => 'ru-RU',
+            'language' => 'ru-RU',
+            'timeZone' => 'Europe/Moscow',
+        ],
         'request' => [
             // !!! insert a secret key in the following (if it is empty) - this is required by cookie validation
             'cookieValidationKey' => '79hXXTRemrQIeI9Kiicmqm9zHNc0DsSt',
@@ -21,7 +31,8 @@ $config = [
         ],
         'user' => [
             'identityClass' => 'app\models\User',
-            'enableAutoLogin' => true,
+            'loginUrl' => ['/login'],
+            'enableAutoLogin' => false,
         ],
         'errorHandler' => [
             'errorAction' => 'site/error',
@@ -43,14 +54,24 @@ $config = [
             ],
         ],
         'db' => $db,
-        /*
         'urlManager' => [
             'enablePrettyUrl' => true,
             'showScriptName' => false,
+            'enableStrictParsing' => false,
             'rules' => [
+                'registration' => 'auth/registration',
+                'login' => 'auth/login',
+                'logout' => 'auth/logout',
+                'tasks/view/<id:\d+>' => 'tasks/view',
+                'tasks/cancel/<taskID:\d+>' => 'tasks/cancel',
+                'tasks/accept/<taskID:\d+>' => 'tasks/accept',
+                'tasks/refuse/<taskID:\d+>' => 'tasks/refuse',
+                'user/<id:\d+>' => 'user/index',
+                'response/add/<taskID:\d+>' => 'response/add',
+                'response/refuse/<id:\d+>' => 'response/refuse',
+                'response/accept/<id:\d+>' => 'response/accept',
             ],
         ],
-        */
     ],
     'params' => $params,
     'controllerMap' => [

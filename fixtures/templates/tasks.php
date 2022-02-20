@@ -13,7 +13,7 @@ return [
     'price' => $faker->numberBetween(1000, 100000),
     'deadline' => $faker->date() . ' ' . $faker->time(),
     'category_id' => $faker->numberBetween(1, 20),
-    'customer_id' => $faker->numberBetween(1, 20),
-    'performer_id' => $faker->numberBetween(1, 20),
+    'customer_id' => $faker->numberBetween(1, 10),
+    'performer_id' => $faker->numberBetween(11, 20),
     'city_id' => $faker->numberBetween(1, 1000),
 ];

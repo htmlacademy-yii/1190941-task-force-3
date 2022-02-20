@@ -2,11 +2,19 @@
 
 /**
  * @var $this yii\web\View
- * @var $tasks array
+ * @var $dataProvider ActiveDataProvider
+ * @var $model TaskFilterForm
+ * @var $categories Category
  */
 
+use yii\data\ActiveDataProvider;
 use yii\helpers\Html;
-use tf\helpers\DateModifier;
+use yii\widgets\ActiveForm;
+
+use app\models\Category;
+use app\models\TaskFilterForm;
+
+use yii\widgets\ListView;
 
 $this->title = 'Новые задания';
 ?>
@@ -15,76 +23,67 @@ $this->title = 'Новые задания';
 	<div class="left-column">
 		<h3 class="head-main head-task">Новые задания</h3>
 
-		<?php foreach($tasks as $task): ?>
-		<div class="task-card">
-			<div class="header-task">
-				<a href="#" class="link link--block link--big"><?= Html::encode($task['title']) ?></a>
-				<p class="price price--task"><?= Html::encode($task['price']) ?> ₽</p>
-			</div>
-			<p class="info-text">
-				<span class="current-time"><?= DateModifier::getRelativeFormat($task['created_at'], 'назад'); ?></span>
-			</p>
-			<p class="task-text"><?= Html::encode($task['description']) ?></p>
-			<div class="footer-task">
-				<p class="info-text town-text"><?= Html::encode($task['city']) ?></p>
-				<p class="info-text category-text"><?= Html::encode($task['category']) ?></p>
-				<a href="#" class="button button--black">Смотреть Задание</a>
-			</div>
-		</div>
-		<?php endforeach; ?>
-
-		<div class="pagination-wrapper">
-			<ul class="pagination-list">
-				<li class="pagination-item mark">
-					<a href="#" class="link link--page"></a>
-				</li>
-				<li class="pagination-item">
-					<a href="#" class="link link--page">1</a>
-				</li>
-				<li class="pagination-item pagination-item--active">
-					<a href="#" class="link link--page">2</a>
-				</li>
-				<li class="pagination-item">
-					<a href="#" class="link link--page">3</a>
-				</li>
-				<li class="pagination-item mark">
-					<a href="#" class="link link--page"></a>
-				</li>
-			</ul>
-		</div>
+        <?= ListView::widget([
+            'dataProvider' => $dataProvider,
+            'itemView' => '_preview',
+            'emptyText' => 'По вашему запросу не найдено ни одной записи',
+            'pager' => [
+                'activePageCssClass' => 'pagination-item--active',
+                'pageCssClass' => 'pagination-item',
+                'prevPageCssClass' => 'pagination-item mark',
+                'nextPageCssClass' => 'pagination-item mark',
+                'prevPageLabel' => '',
+                'nextPageLabel' => '',
+                'linkOptions' => [
+                    'class' => 'link link--page'
+                ],
+                'options' => [
+                    'class' => 'pagination-list'
+                ]
+            ]
+        ]) ?>
 	</div>
 
 	<div class="right-column">
 		<div class="right-card black">
 			<div class="search-form">
-				<form>
-					<h4 class="head-card">Категории</h4>
-					<div class="form-group">
-						<div>
-							<input type="checkbox" id="сourier-services" checked>
-							<label class="control-label" for="сourier-services">Курьерские услуги</label>
-							<input id="cargo-transportation" type="checkbox">
-							<label class="control-label" for="cargo-transportation">Грузоперевозки</label>
-							<input id="translations" type="checkbox">
-							<label class="control-label" for="translations">Переводы</label>
-						</div>
-					</div>
-					<h4 class="head-card">Дополнительно</h4>
-					<div class="form-group">
-						<input id="without-performer" type="checkbox" checked>
-						<label class="control-label" for="without-performer">Без исполнителя</label>
-					</div>
-					<h4 class="head-card">Период</h4>
-					<div class="form-group">
-						<label for="period-value"></label>
-						<select id="period-value">
-							<option>1 час</option>
-							<option>12 часов</option>
-							<option>24 часа</option>
-						</select>
-					</div>
-					<input type="button" class="button button--blue" value="Искать">
-				</form>
+                <?php $form = ActiveForm::begin([
+                    'action' => '/tasks/index', // todo смотреть на строку запроса, почему /tasks не достаточно?
+                    'id' => null,
+                    'method' => 'get',
+                    'enableAjaxValidation' => false,
+                    'enableClientValidation' => false,
+                    'fieldConfig' => [
+                        'template' => "{input}",
+                    ]
+                ]); ?>
+
+				<h4 class="head-card">Категории</h4>
+                <?= $form->field($model, 'categories', [
+                    'template' => "{input}",
+                    'addAriaAttributes' => false,
+                ])
+                    ->checkboxList($categories, [
+                        'item' => function ($index, $label, $name, $checked, $value) {
+                            return Html::checkbox($name, $checked,
+                                    ['value' => $value, 'id' => "category-id-{$value}"])
+                                . "<label class=\"control-label\" for=\"category-id-{$value}\">" . $label . '</label>';
+                        }
+                    ]); ?>
+
+				<h4 class="head-card">Дополнительно</h4>
+                <?= $form->field($model, 'withoutResponses')->checkbox(); ?>
+                <?= $form->field($model, 'remoteWork')->checkbox(); ?>
+
+				<h4 class="head-card">Период</h4>
+                <?= $form->field($model, 'period')->dropDownList(TaskFilterForm::PERIOD_MAP); ?>
+
+                <?= Html::button('Искать', [
+                    'type' => 'submit',
+                    'class' => 'button button--blue'
+                ]) ?>
+
+                <?php ActiveForm::end(); ?>
 			</div>
 		</div>
 	</div>
